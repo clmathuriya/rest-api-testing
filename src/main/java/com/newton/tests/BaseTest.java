@@ -44,7 +44,9 @@ public class BaseTest {
 
 		// reporter = MyReporter.getInstance();
 		System.out.println("existing value : " + System.getProperty("hudson.model.DirectoryBrowserSupport.CSP"));
-		System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "sandbox allow-scripts;");
+		System.clearProperty("hudson.model.DirectoryBrowserSupport.CSP");
+
+		System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "sandbox allow-scripts; default-src 'self'; script-src * 'unsafe-eval'; img-src *; style-src * 'unsafe-inline'; font-src *");
 
 		System.out.println("after value : " + System.getProperty("hudson.model.DirectoryBrowserSupport.CSP"));
 		util = Util.getInstance();
