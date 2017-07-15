@@ -44,7 +44,7 @@ public class BaseTest {
 
 		// reporter = MyReporter.getInstance();
 		System.out.println("existing value : " + System.getProperty("hudson.model.DirectoryBrowserSupport.CSP"));
-		System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "sandbox; default-src 'self';");
+		System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "");
 
 		System.out.println("after value : " + System.getProperty("hudson.model.DirectoryBrowserSupport.CSP"));
 		util = Util.getInstance();
