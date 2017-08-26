@@ -1,8 +1,16 @@
 package com.newton.executor;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.core.MultivaluedHashMap;
 
 import org.apache.commons.lang3.time.StopWatch;
+import org.codehaus.jettison.json.JSONObject;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.skyscreamer.jsonassert.JSONCompare;
@@ -11,6 +19,7 @@ import org.skyscreamer.jsonassert.JSONCompareResult;
 import org.testng.Assert;
 import org.testng.Reporter;
 
+import com.google.gson.JsonObject;
 import com.newton.reporter.MyReporter;
 import com.newton.utils.MyJsonComparator;
 import com.newton.utils.Util;
@@ -93,7 +102,7 @@ public class Executioner {
 
 	}
 
-	public String doHttpGet(WebResource builder, Class<ClientResponse> c, ExtentTest test) {
+	public String doHttpGet(WebResource webResource, Map<String, String> testData, Class<ClientResponse> c, ExtentTest test) {
 		String screenshot = "NA";
 
 		ClientResponse clientResponse = null;
@@ -101,18 +110,18 @@ public class Executioner {
 		try {
 
 			startTime = stopWatch.getTime();
-			clientResponse = builder.accept("application/json").get(c);
+			clientResponse = util.setHeaders(webResource, testData).accept("application/json").get(c);
 			output = clientResponse.getEntity(String.class);
 
 			screenshot = util.saveResponse(output);
 
-			addStep(startTime, stopWatch.getTime() - startTime, "Method : GET <br> URL: " + builder.getURI()
+			addStep(startTime, stopWatch.getTime() - startTime, "Method : GET <br> URL: " + webResource.getURI()
 					+ " <br> <br> Response Code:" + clientResponse.getStatus(), "Pass", screenshot, test);
 
 			return output;
 		} catch (AssertionError exception) {
 			addStep(startTime, stopWatch.getTime() - startTime,
-					"HTTP GET \n URL: " + builder.getURI() + " \n Response Code:" + clientResponse.getStatus(),
+					"HTTP GET \n URL: " + webResource.getURI() + " \n Response Code:" + clientResponse.getStatus(),
 					"Failed", screenshot, test);
 
 		} catch (IOException e) {
@@ -125,7 +134,7 @@ public class Executioner {
 
 	}
 
-	public String doHttpPost(WebResource webResource, Class<ClientResponse> c, String requestData, ExtentTest test) {
+	public String doHttpPost(WebResource webResource, Map<String,String> testData, Class<ClientResponse> c, String requestData, ExtentTest test) {
 		String screenshot = "NA";
 
 		ClientResponse clientResponse = null;
@@ -133,7 +142,7 @@ public class Executioner {
 		try {
 
 			startTime = stopWatch.getTime();
-			clientResponse = webResource.type("application/json").post(c, requestData);
+			clientResponse = util.setHeaders(webResource, testData).type("application/json").post(c, requestData);
 			output = clientResponse.getEntity(String.class);
 
 			// System.out.println(output);
@@ -160,7 +169,7 @@ public class Executioner {
 
 	}
 
-	public String doHttpPost(WebResource webResource, Class<ClientResponse> c, ExtentTest test) {
+	public String doHttpPostWithFomrParams(WebResource webResource, Map<String,String> testData, Class<ClientResponse> c, String requestFormData, ExtentTest test) {
 		String screenshot = "NA";
 
 		ClientResponse clientResponse = null;
@@ -168,7 +177,48 @@ public class Executioner {
 		try {
 
 			startTime = stopWatch.getTime();
-			clientResponse = webResource.type("application/json").post(c);
+			Map<String, List<String>> requestMap =new MultivaluedHashMap<>();
+			JSONObject params = new JSONObject(requestFormData);
+			Iterator<JsonObject> it = params.keys();
+			while (it.hasNext()) {
+				String key = it.next() + "";
+				requestMap.put(key, Arrays.asList(params.get(key)+""));
+			}
+			clientResponse = util.setHeaders(webResource, testData).type("application/x-www-form-urlencoded").accept("application/json").post(c, requestMap);
+			output = clientResponse.getEntity(String.class);
+
+			// System.out.println(output);
+
+			screenshot = util.saveResponse(output);
+
+			addStep(startTime, stopWatch.getTime() - startTime, "Method : POST <br> URL: " + webResource.getURI()
+					+ " <br> <br> Request Form Data : " + requestFormData + " <br>Response Code:" + clientResponse.getStatus(),
+					"Pass", screenshot, test);
+
+			return output;
+		} catch (AssertionError exeption) {
+			addStep(startTime, stopWatch.getTime() - startTime,
+					"HTTP GET \n URL: " + webResource.getURI() + " \n Response Code:" + clientResponse.getStatus(),
+					"Failed", screenshot, test);
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();//
+
+		} finally {
+			return output;
+		}
+
+	}
+	public String doHttpPost(WebResource webResource, Map<String,String> testData, Class<ClientResponse> c, ExtentTest test) {
+		String screenshot = "NA";
+
+		ClientResponse clientResponse = null;
+		String output = "";
+		try {
+
+			startTime = stopWatch.getTime();
+			clientResponse = util.setHeaders(webResource, testData).type("application/json").post(c);
 			output = clientResponse.getEntity(String.class);
 
 			// System.out.println(output);
@@ -232,7 +282,7 @@ public class Executioner {
 		} catch (AssertionError | org.json.JSONException exception) {
 			addStep(startTime, stopWatch.getTime() - startTime, message + " <br> " + exception.getMessage(), "Failed",
 					screenshot, test);
-			// Assert.fail(exception.getMessage());
+			Assert.fail(exception.getMessage());
 
 			return this;
 

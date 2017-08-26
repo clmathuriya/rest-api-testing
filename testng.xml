@@ -3,8 +3,7 @@
 <suite name="Suite" parallel="false">
 	<test name="Regression Test ">
 		<classes>
-			<class name="com.newton.tests.RestSampleTest" />
-
+			<class name="com.newton.tests.ConnectToParentTests" />
 		</classes>
 	</test> <!-- Test -->
 </suite> <!-- Suite -->
