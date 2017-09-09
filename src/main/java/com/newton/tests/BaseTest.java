@@ -105,7 +105,7 @@ public class BaseTest {
 	}
 	
 	public void defaultRestCall(Map <String, String> testData) throws JSONException{
-		Config.vars = testData;
+		//Config.vars = testData;
 		test = extentReporter.startTest(testData.get("TestName"));
 		setParams(testData);
 		WebResource webResource = client.resource(baseURL + testData.get("APIEndPoint"));
@@ -142,7 +142,7 @@ public class BaseTest {
 			formParamsJson = "{}";
 		}
 		
-		headers = testData.get("Headers");
+		headers = testData.get("RequestHeaders");
 		if (headers != null && headers.length() > 2) {
 			headersJson = util.readFileAsString("headers/" + headers + ".json");
 		} 

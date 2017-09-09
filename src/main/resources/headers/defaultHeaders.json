@@ -1,4 +1,4 @@
 {
-	"X-Session": "$sessionToken",
-	"X-VERSION-CODE": 23
+	"Cookie": "$session_id",
+	"Content-Type": "application/x-www-form-urlencoded"
 }

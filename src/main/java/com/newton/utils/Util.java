@@ -81,7 +81,11 @@ public class Util {
 			Iterator<JsonObject> it = params.keys();
 			while (it.hasNext()) {
 				String key = it.next() + "";
-				webResource = webResource.queryParam(key, params.get(key) + "");
+				String value= params.getString(key).toString();
+				if (value.startsWith("$")) {
+					value = Config.vars.get(value);
+				}
+				webResource = webResource.queryParam(key, value);
 			}
 
 		} catch (JSONException e) {
@@ -122,7 +126,7 @@ public class Util {
 				if (value.toString().startsWith("$")) {
 					value = Config.vars.get(value);
 				}
-				header = webResource.header(key, value);
+				header = header.header(key, value);
 			}
 
 		} catch (JSONException e) {

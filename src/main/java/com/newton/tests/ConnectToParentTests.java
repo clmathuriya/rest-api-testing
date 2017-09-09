@@ -27,6 +27,9 @@ public class ConnectToParentTests extends BaseTest {
 		defaultRestCall(testData);
 		// verify success message
 		executor.verifyEquals(!response.get("errCode").toString().equals("-1"),true, "verify success message", test);
+		//save session id and student id
+		Config.vars.put("$student_id", "student_id:"+response.getJSONArray("resource").getJSONObject(0).get("id").toString());
+		Config.vars.put("$session_id", "session_id=\"" + response.getJSONArray("resource").getJSONObject(0).get("session_id") +"\"");
 	}
 	/**
 	 * 
@@ -41,7 +44,7 @@ public class ConnectToParentTests extends BaseTest {
 	public void getStudentPhotoTest(Map<String, String> testData) throws JsonGenerationException, JsonMappingException, IOException, JSONException {
 		defaultRestCall(testData);
 		// verify success message
-		executor.verifyEquals(!response.get("errCode").toString().equals("-1"),true, "verify success message", test);
+		executor.verifyEquals(response.get("errCode").toString().equals("0"),true, "verify success message", test);
 	}
 	@DataProvider (name = "loginDataProvider")
 	public Object[][] loginDataProvider() {
